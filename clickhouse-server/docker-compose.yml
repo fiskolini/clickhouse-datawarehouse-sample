@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server:23.9.1.1854-alpine
+    container_name: clickhouse-data-warehouse
+    hostname: clickhouse
+    volumes:
+      - ./.docker/clickhouse/config.xml:/etc/clickhouse-server/config.d/config.xml
+      - ./.docker/clickhouse/users.xml:/etc/clickhouse-server/users.d/users.xml
+      - ./.data/clickhouse:/var/lib/clickhouse # preserve data in disk
+    ports:
+      - "127.0.0.1:8123:8123"
+      - "127.0.0.1:9000:9000"
+
+  grafana:
+    build:
+      context: .
+      dockerfile: grafana.Dockerfile
+    container_name: grafana-data-warehouse
+    hostname: grafana
+    volumes:
+      - ./.docker/grafana:/etc/grafana/provisioning/datasources
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      - clickhouse
