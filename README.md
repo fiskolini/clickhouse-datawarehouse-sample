@@ -48,3 +48,4 @@ To set up this high availability ClickHouse installation, follow these steps:
 - Both installations use Docker Compose to manage the containers and simplify deployment.
 - The provided configurations are examples and may need to be adjusted for specific production environments.
 - Refer to the official ClickHouse documentation for detailed configuration options and advanced usage scenarios.
+- The presentation slides can be found [here](https://docs.google.com/presentation/d/17j9e7hAlzq8NS9aIm8xDURhI2WC1MNPqN0SvbeLJv5M/edit?usp=sharing) (Google Slides) and a copy of them can be found in the `presentation.pdf` file.
