@@ -2,16 +2,16 @@ version: '3.8'
 
 services:
   clickhouse-01:
-    image: "clickhouse/clickhouse-server:${CHVER:-latest}"
-    user: "101:101"
-    container_name: clickhouse-01
+    image: clickhouse/clickhouse-server:23.9.1.1854-alpine
+    container_name: clickhouse-dwh-ch-node-01
     hostname: clickhouse-01
     networks:
-      cluster_2S_1R_ch_proxy:
+      cluster_foo_ch_proxy:
         ipv4_address: 192.168.7.1
     volumes:
-      - ${PWD}/fs/volumes/clickhouse-01/etc/clickhouse-server/config.d/config.xml:/etc/clickhouse-server/config.d/config.xml
-      - ${PWD}/fs/volumes/clickhouse-01/etc/clickhouse-server/users.d/users.xml:/etc/clickhouse-server/users.d/users.xml
+      - ./.docker/clickhouse-01/config.xml:/etc/clickhouse-server/config.d/config.xml
+      - ./.docker/clickhouse-01/users.xml:/etc/clickhouse-server/users.d/users.xml
+      - ./.data/clickhouse-01:/var/lib/clickhouse
     ports:
       - "127.0.0.1:8123:8123"
       - "127.0.0.1:9000:9000"
@@ -21,16 +21,16 @@ services:
       - clickhouse-keeper-03
 
   clickhouse-02:
-    image: "clickhouse/clickhouse-server:${CHVER:-latest}"
-    user: "101:101"
-    container_name: clickhouse-02
+    image: clickhouse/clickhouse-server:23.9.1.1854-alpine
+    container_name: clickhouse-dwh-ch-node-02
     hostname: clickhouse-02
     networks:
-      cluster_2S_1R_ch_proxy:
+      cluster_foo_ch_proxy:
         ipv4_address: 192.168.7.2
     volumes:
-      - ${PWD}/fs/volumes/clickhouse-02/etc/clickhouse-server/config.d/config.xml:/etc/clickhouse-server/config.d/config.xml
-      - ${PWD}/fs/volumes/clickhouse-02/etc/clickhouse-server/users.d/users.xml:/etc/clickhouse-server/users.d/users.xml
+      - ./.docker/clickhouse-02/config.xml:/etc/clickhouse-server/config.d/config.xml
+      - ./.docker/clickhouse-02/users.xml:/etc/clickhouse-server/users.d/users.xml
+      - ./.data/clickhouse-02:/var/lib/clickhouse
     ports:
       - "127.0.0.1:8124:8123"
       - "127.0.0.1:9001:9000"
@@ -40,62 +40,59 @@ services:
       - clickhouse-keeper-03
 
   clickhouse-keeper-01:
-    image: "clickhouse/clickhouse-keeper:${CHKVER:-latest-alpine}"
-    user: "101:101"
-    container_name: clickhouse-keeper-01
+    image: clickhouse/clickhouse-keeper:23.9.1.1854-alpine
+    container_name: clickhouse-dwh-keeper-01
     hostname: clickhouse-keeper-01
     networks:
-      cluster_2S_1R_ch_proxy:
+      cluster_foo_ch_proxy:
         ipv4_address: 192.168.7.5
     volumes:
-      - ${PWD}/fs/volumes/clickhouse-keeper-01/etc/clickhouse-keeper/keeper_config.xml:/etc/clickhouse-keeper/keeper_config.xml
+      - ./.docker/clickhouse-keeper-01/keeper_config.xml:/etc/clickhouse-keeper/keeper_config.xml
     ports:
       - "127.0.0.1:9181:9181"
 
   clickhouse-keeper-02:
-    image: "clickhouse/clickhouse-keeper:${CHKVER:-latest-alpine}"
-    user: "101:101"
-    container_name: clickhouse-keeper-02
+    image: clickhouse/clickhouse-keeper:23.9.1.1854-alpine
+    container_name: clickhouse-dwh-keeper-02
     hostname: clickhouse-keeper-02
     networks:
-      cluster_2S_1R_ch_proxy:
+      cluster_foo_ch_proxy:
         ipv4_address: 192.168.7.6
     volumes:
-      - ${PWD}/fs/volumes/clickhouse-keeper-02/etc/clickhouse-keeper/keeper_config.xml:/etc/clickhouse-keeper/keeper_config.xml
+      - ./.docker/clickhouse-keeper-02/keeper_config.xml:/etc/clickhouse-keeper/keeper_config.xml
     ports:
       - "127.0.0.1:9182:9181"
 
   clickhouse-keeper-03:
-    image: "clickhouse/clickhouse-keeper:${CHKVER:-latest-alpine}"
-    user: "101:101"
-    container_name: clickhouse-keeper-03
+    image: clickhouse/clickhouse-keeper:23.9.1.1854-alpine
+    container_name: clickhouse-dwh-keeper-03
     hostname: clickhouse-keeper-03
     networks:
-      cluster_2S_1R_ch_proxy:
+      cluster_foo_ch_proxy:
         ipv4_address: 192.168.7.7
     volumes:
-      - ${PWD}/fs/volumes/clickhouse-keeper-03/etc/clickhouse-keeper/keeper_config.xml:/etc/clickhouse-keeper/keeper_config.xml
+      - ./.docker/clickhouse-keeper-03/keeper_config.xml:/etc/clickhouse-keeper/keeper_config.xml
     ports:
       - "127.0.0.1:9183:9181"
 
   ch-proxy:
-    image: tacyuuhon/clickhouse-chproxy
-    container_name: ch-proxy
+    image: tacyuuhon/clickhouse-chproxy:1.24.0
+    container_name: clickhouse-dwh-ch-proxy
     hostname: ch-proxy
     networks:
-      cluster_2S_1R_ch_proxy:
+      cluster_foo_ch_proxy:
         ipv4_address: 192.168.7.10
     ports:
       - "127.0.0.1:443:443"
       - "127.0.0.1:80:80"
     volumes:
-      - ${PWD}/fs/volumes/ch-proxy/config/config.yml:/opt/config.yml
+      - ./.docker/ch-proxy/config.yml:/opt/config.yml
     depends_on:
       - clickhouse-01
       - clickhouse-02
 
 networks:
-  cluster_2S_1R_ch_proxy:
+  cluster_foo_ch_proxy:
     driver: bridge
     ipam:
       config:

@@ -1,0 +1,21 @@
+server:
+  http:
+    listen_addr: ':80'
+    allowed_networks: [ '127.0.0.0/24', '192.168.7.0/24' ]
+
+users:
+  - name: 'user'
+    to_cluster: 'cluster_foo'
+    to_user: 'default'
+    max_concurrent_queries: 100
+    max_execution_time: 30s
+    requests_per_minute: 10
+
+clusters:
+  - name: 'cluster_foo'
+    nodes: [ 'clickhouse-dwh-ch-node-01:8123', 'clickhouse-dwh-ch-node-02:8123' ]
+    users:
+      - name: 'default'
+
+
+# http://127.0.0.1:80?user=user
